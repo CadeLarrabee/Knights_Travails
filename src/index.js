@@ -15,7 +15,9 @@ function OnEntry() {
         } else {
           square.classList.add("black");
         }
-        square.setAttribute("id", row + "" + col);
+        square.setAttribute("row", row);
+        square.setAttribute("col", col);
+        square.id = `${row}-${col}`;
         square.addEventListener("click", () => {
           AddKnight(square);
         });
@@ -30,12 +32,26 @@ function AddKnight(square) {
   //given a square, add a knight
   if (!square.querySelector("img")) {
     const img = document.createElement("img");
-    img.src = "knight.png";
+    img.classList.add("knight");
+    img.src = "./img/knight.png";
     square.appendChild(img);
+    targetX = Math.floor(Math.random() * 7);
+    targetY = Math.floor(Math.random() * 7);
+    BFS(
+      parseInt(square.getAttribute("row"), 10),
+      parseInt(square.getAttribute("col"), 10),
+      targetX,
+      targetY
+    );
   }
 }
 
 function BFS(startX, startY, targetX, targetY, N = 8) {
+  //mark target
+  const targetElement = document.getElementById(`${targetX}-${targetY}`);
+  if (targetElement) {
+    targetElement.classList.add("target"); // Mark the target element (optional)
+  }
   //Given a start and a target, search the board
   const moves = [
     [2, 1],
@@ -48,14 +64,16 @@ function BFS(startX, startY, targetX, targetY, N = 8) {
     [-1, -2],
   ];
 
-  function isValid(x, y) {
-    return x >= 0 && x < N && y >= 0 && y < N;
-  }
-
   function findAllPossibleMoves(x, y) {
-    return moves
-      .map((move) => [x + move[0], y + move[1]])
-      .filter(([newX, newY]) => isValid(newX, newY));
+    const modifiedMoves = moves.map((element) => {
+      const newX = element[0] + x;
+      const newY = element[1] + y;
+      if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8) {
+        return [newX, newY];
+      }
+      return null;
+    });
+    return modifiedMoves.filter((move) => move !== null);
   }
 
   const queue = [[startX, startY, 0]]; // [x, y, distance]
@@ -66,11 +84,14 @@ function BFS(startX, startY, targetX, targetY, N = 8) {
 
   while (queue.length > 0) {
     const [x, y, dist] = queue.shift();
+    //console.log(x, y, dist);
 
     if (x === targetX && y === targetY) {
-      console.log(dist);
+      console.log("found at: " + dist);
       return dist;
     }
+
+    //This could be improved by removing all possible moves that are on the other side of the board
 
     const possibleMoves = findAllPossibleMoves(x, y);
     for (const [newX, newY] of possibleMoves) {

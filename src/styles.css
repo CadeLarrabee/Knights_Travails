@@ -17,6 +17,9 @@ body {
 .square {
   width: 50px;
   height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .black {
@@ -25,4 +28,11 @@ body {
 
 .white {
   background-color: #eeeed2;
+}
+.knight {
+  height: 5vh;
+  width: 5vh;
+}
+.target {
+  background-color: #df421b;
 }
